@@ -2,7 +2,7 @@
 
 ## Instructions:
 
-The file [`parser.py`](parser.py) contains the `ZTMReader` which is used to read and parse the ZTM timetable data.
+The file [`parser.py`](parser.py) contains the `ZTMReader` class which is used to read and parse the ZTM timetable data.
 
 After reading (invoking the `.read()` method) the class has the following important properties:
 
@@ -25,7 +25,7 @@ After reading (invoking the `.read()` method) the class has the following import
 
 ## Example
 
-```{python}
+``` {python}
 from parser import ZTMReader
 import networkx as nx
 
