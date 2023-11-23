@@ -25,7 +25,7 @@ After reading (invoking the `.read()` method) the class has the following import
 
 ## Example
 
-``` {python}
+```python
 from parser import ZTMReader
 import networkx as nx
 
