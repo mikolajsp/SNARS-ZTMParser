@@ -74,8 +74,25 @@ class ZTMReader:
                     ZTMIterator.iterate(iterator, "WK").run(self.read_routes)
             except StopIteration:
                 self.is_read = True
-                return
+
         self.is_read = True
+
+        self._determine_stop_type()
+
+    def _determine_stop_type(self):
+        for key, value in self.stops.items():
+            temp_set = set()
+            len_lines = len(value["lines"])
+            for i in range(len_lines):
+                if value["lines"][i].startswith("S") or value["lines"][0].startswith(
+                    "R"
+                ):
+                    temp_set.add("train")
+                elif len(value["lines"][i]) <= 2:
+                    temp_set.add("tram")
+                else:
+                    temp_set.add("bus")
+            self.stops[key]["type"] = list(temp_set)
 
     def read_busstop_groups(self, lines: Sequence[str]) -> None:
         try:
@@ -98,14 +115,24 @@ class ZTMReader:
                 self.stop_groups[busstop_group_id] = busstop_group_name
 
     def read_busstops(self, lines: Sequence[str]) -> None:
+        last_busstop_id = ""
         for line in lines:
             # bus stops are defined on lines starting with 6 digits
             if re.match(r"\d{6}\s", line):
                 # bus stop data is separated by 2 or more spaces
                 busstop_info = re.split(r"\s{2,}", line)
-                self.parse_busstop(busstop_info)
+                last_busstop_id = self.parse_busstop(busstop_info)
+            if re.match(r"L\s", line):
+                busline_info = re.split(r"\s{1,}", line)
+                num_lines = int(busline_info[1])
+                len_info = len(busline_info)
 
-    def parse_busstop(self, busstop_info: Sequence[str]) -> None:
+                for i in range(len_info - num_lines, len_info):
+                    self.stops[last_busstop_id]["lines"].append(
+                        busline_info[i].replace("^", "")
+                    )
+
+    def parse_busstop(self, busstop_info: Sequence[str]) -> str:
         busstop_id = busstop_info[0]
         busstop_street = busstop_info[2].strip(",")
 
@@ -122,8 +149,11 @@ class ZTMReader:
             "street": busstop_street,
             "lat": lat,
             "long": long,
+            "lines": [],
+            "type": None,
         }
         self.stops[busstop_id] = busstop
+        return busstop_id
 
     def _parse_time(self, time: str) -> int:
         """
@@ -205,12 +235,12 @@ if __name__ == "__main__":
     reader = ZTMReader("Lab8/data/RA231125.TXT")
     reader.read()
 
-    for i, stop in enumerate(reader.stops.values()):
-        print(stop)
-        if i > 10:
+    for i, (stop, value) in enumerate(reader.stops.items()):
+        print(stop, value)
+        if i > 10000:
             break
 
-    for i, edge in enumerate(reader.edges):
-        print(edge)
-        if i > 10:
-            break
+    # for i, edge in enumerate(reader.edges):
+    #     print(edge)
+    #     if i > 100000:
+    #         break

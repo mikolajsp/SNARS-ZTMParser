@@ -12,6 +12,8 @@ After reading (invoking the `.read()` method) the class has the following import
     - `street: str` - the name of the street on which the bus stop is located.
     - `lat: float` - the lattitude of the bus stop (in degrees north)
     - `long: float` - the longitude of the bus stop (in degrees east)
+    - `lines: list` - a list of lines that stop at that stop
+    - `type: list` - a list of modes of transport that stop at the stop. Possible values are `"bus"`, `"tram"`, `"train"` (metro is not present in the data)
 - `edges` - a `list` of `dict`s describing connections between bus stops. The keys and values of each dict are:
     - `route: str` - a unique identifier of the route
     - `from: str` - the id of the bus stop from which the edge starts
